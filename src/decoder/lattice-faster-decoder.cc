@@ -755,7 +755,10 @@ BaseFloat LatticeFasterDecoder::ProcessEmitting(DecodableInterface *decodable) {
               graph_cost = arc.weight.Value(),
               cur_cost = tok->tot_cost,
               tot_cost = cur_cost + ac_cost + graph_cost;
-          if (tot_cost > next_cutoff) continue;
+          // Using >= instead of > is important here. If next_cutoff is not updated
+          // yet (infinity) and we don't want to proceed with an arc with infinity
+          // score as well (score from from AM).
+          if (tot_cost >= next_cutoff) continue;
           else if (tot_cost + adaptive_beam < next_cutoff)
             next_cutoff = tot_cost + adaptive_beam; // prune by best current token
           // Note: the frame indexes into active_toks_ are one-based,
